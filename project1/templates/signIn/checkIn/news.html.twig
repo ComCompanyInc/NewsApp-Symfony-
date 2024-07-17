@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<a href="{{ path('news') }}"> Главная </a> &emsp;
+<a href="{{ path('addNews') }}"> Добавить новость </a>
+
+    <h2>Новости:</h2>
+
+    <style type="text/css">
+        table, th, td {
+            border: 1px solid black;
+        }
+    </style>
+
+    {% if news %}
+    <table>
+        <thead>
+            <tr>
+               {# <th>id</th> #}
+                <th>Текст</th>
+                <th>Имя автора</th>
+                <th>Фамилия автора</th>
+                <th>Дата</th>
+                <th>Подробнее</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for new in news %}
+                <tr>
+                   {# <td>{{ new.id }}</td> #}
+                    <td>{{ new.text | slice(0,50)}}</td>
+                     <td>{{ new.author.name}}</td>
+                     <td>{{ new.author.Surname}}</td>
+                     <td>{{ new.dateCreating | date }}</td>
+                    <td>
+                        <a href="{{ path('comments',{'idNews':new.id, 'idUser':idUser}) }}" > {# ссылка на переход к другой странице (с передачей в роут(URL) параметров ключей) #}
+                            <h4>
+                                Читать далее
+                            </h4>
+                        </a>
+                    </td>
+                    {#
+                    <td>
+                        <a href="{{ path('deleteNews',{'idNews':new.id}) }}" >#} {# ссылка на переход к другой странице (с передачей в роут(URL) параметров ключей) #}
+                        {# <h4>
+                                Удалить новость
+                            </h4>
+                        </a>
+                    </td>
+                    #}
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <h4> Новостей пока нет </h4>
+{% endif %}
+
+<br />
+<a href="/logout">Выйти из аккаунта</a>
+
+</body>
+</html>
+{% endblock %}
