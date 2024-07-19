@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    {{form(addNewsForm)}}
+
+    {% if state %}
+        {{ state }}
+    {% endif %}
+
+    <br />
+
+    <a href="{{ path('news') }}">назад</a>
+{% endblock %}

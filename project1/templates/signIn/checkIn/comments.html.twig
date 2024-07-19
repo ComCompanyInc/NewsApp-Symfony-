@@ -1,0 +1,117 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div id="comments-list">
+<h1>Комментарии:</h1>
+<h3>Добавить комментарий:</h3>
+{#
+{{ form_start(commentsForm) }} <br />
+    {{ form_widget(commentsForm.commentText) }}
+    {{ form_widget(commentsForm.buttonSend) }}
+{{ form_end(commentsForm) }}
+#}
+
+<h4>Новость целиком:</h4>
+    {{ newsText }} <br /> <br />
+    Дата публикации: {{ newsDateText | date}} <br />
+    Имя автора: {{ newsAuthorName }} <br />
+    Фамилия автора: {{ newsAuthorSurname }} <br />
+<br/>
+
+{{ form(commentsForm) }}
+
+<style type="text/css">
+    table, th, td {
+        border: 1px solid black;
+    }
+</style>
+
+    <table>
+
+    {% if comments %}
+    <thead>
+        <tr>
+        {# <th>id</th> #}
+            <th>Текст</th>
+            <th>Имя автора</th>
+            <th>Фамилия автора</th>
+            <th>Дата</th>
+        </tr>
+    </thead>
+        <tbody>
+    {% for comment in comments%}
+                <tr class="{{ comment.id }}">
+                    {# <td>{{ comment.id }}</td> #}
+                    <td> {{ comment.text }} </td>
+                    <td>{{ comment.authorId.name}}</td>
+                    <td>{{ comment.authorId.Surname}}</td>
+                    <td>{{ comment.dateCreating | date}}</td>
+            <td>
+                {% if comment.authorId == idUser %}
+                    <button class="delete-button" data-id="{{ comment.id }}"> Удалить комментарий </button>
+                {% endif %}
+            </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% else %}
+        <h4>Комментариев пока нет</h4>
+    {% endif %}
+
+<a href="{{ path("news")}}"> Назад </a>
+
+    <button id="changeColorButton"> Раскрасить </button>
+
+<a href="{{ path('deleteNews',{'idNews':idNews}) }}" > {# ссылка на переход к другой странице (с передачей в роут(URL) параметров ключей) #}
+    <h4>
+        Удалить новость
+    </h4>
+</a>
+    </div>
+
+
+    {# Раскрашивание текста в красный цвет #}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var textElement = document.getElementsByClassName('textComments');
+
+            //кнопка - покрасить текст комментария
+            document.getElementById('changeColorButton').addEventListener('click', function() {
+                for(var i = 0; i < textElement.length; i++)
+                    textElement[i].style.color = 'red';
+            });
+        });
+    </script>
+
+
+    {# ajax (запрос на удаление записи)#}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> {# подключение библиотеки JQuery #}
+    <script>
+        $('.delete-button').click(function() { // слушатель нажатия на кнопку по классу delete-button
+            var recordId = $(this).data('id'); // берет id из кнопки где хранится id записи базы данных
+            var deletedElements = document.getElementsByClassName(recordId)
+
+            $.ajax({
+                url: '/comments/delete/' + recordId, // роут на удаление записи из бд по id
+                type: 'GET', // тип запроса для обработки данных
+                success: function(response) { // если успешная отправка сервера
+
+                    console.log(response.message); // вывести консоль (ответ) сервера по роуту переменной url
+
+                    // перезагрузка элемента таблицы без обновления таблицы
+                    //$('#comments-list').load('/comments/' + '{{ idNews }}'); // обновляет div с обновленной таблицей без перезагрузки страницы (страница облочена в div comments-list)
+
+                    for(var i = 0; i < deletedElements.length; i++)
+                        deletedElements[i].style.display = 'none';
+
+                },
+                error: function() { // если вернулась ошибка
+                    alert('Error deleting record (id = ' + recordId + ')'); // вывести id удаляемой строчки в окошко alert
+                }
+            });
+        });
+    </script>
+
+{% endblock %}

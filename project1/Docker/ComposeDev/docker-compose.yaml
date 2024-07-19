@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  test-php:
+    container_name: test-php
+    build:
+      context: ../.
+      dockerfile: dockerPhp.Dockerfile
+    volumes:
+      - ../Configs/php-fpm.conf:/usr/local/etc/php-fpm.conf
+      - ../Configs/php.ini:/usr/local/etc/php/conf.d/php-additional.ini
+      - ../../:/var/www
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      
+  test-nginx:
+    image: nginx:latest
+    container_name: test-nginx
+    ports:
+      - 443:443
+    volumes:
+      - ../../:/var/www
+      - ../Certs:/etc/nginx/certs
+      - ../Configs/nginx.conf:/etc/nginx/nginx.conf
+      - ../Configs/default.conf:/etc/nginx/conf.d/www.conf
+      
+  test-postgres:
+    image: library/postgres:14.7
+    container_name: test-postgres
+    environment:
+      POSTGRES_DB: "test"
+      POSTGRES_USER: "root"
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    ports:
+      - 54320:5432
+    volumes:
+      - postgres_data11:/var/lib/postgresql/data11
+      
+volumes:
+  postgres_data11: {}

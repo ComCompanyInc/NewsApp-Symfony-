@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {{ form(authorizationForm) }}
+
+    <br />
+    <a href="/login"> Назад </a>
+    <br />
+
+    {{ form_end(authorizationForm) }}
+{% endblock %}
+
